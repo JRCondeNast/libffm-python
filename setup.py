@@ -1,15 +1,4 @@
-"""Setup xgboost package."""
-from __future__ import absolute_import
-import sys
-import os
-from setuptools import setup, find_packages
-
-sys.path.insert(0, '.')
-
-CURRENT_DIR = os.path.dirname(__file__)
-
-LIB_PATH = [os.path.relpath('.', CURRENT_DIR)]
-print("Install libffm from: %s" % LIB_PATH)
+from setuptools import setup
 
 # Please use setup_pip.py for generating and deploying pip installation
 # detailed instruction in setup_pip.py
