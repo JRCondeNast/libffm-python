@@ -1,6 +1,8 @@
 # coding: utf-8
 
-lib_path = './libffm/libffm.so'
+import os
+path = os.path.dirname(__file__)
+lib_path = path + '/libffm.so'
 
 # binding code
 
@@ -53,7 +55,7 @@ class FFM_Problem(ctypes.Structure):
         ("n", ctypes.c_int),
         ("m", ctypes.c_int),
     ]
-    
+
 FFM_Node_ptr = ctypes.POINTER(FFM_Node)
 FFM_Line_ptr = ctypes.POINTER(FFM_Line)
 FFM_Model_ptr = ctypes.POINTER(FFM_Model)
@@ -114,12 +116,14 @@ def wrap_dataset(X, y):
     return _lib.ffm_convert_data(line_array, line_array._length_)
 
 class FFMData():
-    def __init__(self, X, y):
-        self._data = wrap_dataset(X, y)
+    def __init__(self, X=None, y=None):
+        if X is not None and y is not None:
+            self._data = wrap_dataset(X, y)
+        else:
+            self._data = None
 
     def num_rows(self):
-        return self._data.size      
-
+        return self._data.size
 
 # FFM model
 
@@ -180,6 +184,6 @@ class FFM():
 
         return self
 
-
+    
 def read_model(path):
     return FFM().read_model(path)

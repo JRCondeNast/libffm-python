@@ -38,25 +38,6 @@ struct ffm_parameter {
     bool auto_stop = false;
 };
 
-struct ffm_line {
-	ffm_node* data;
-	ffm_float label;
-	ffm_int size;
-};
-
-struct ffm_problem {
-    ffm_int size = 0;
-    ffm_long num_nodes = 0;
-
-    ffm_node* data;
-    ffm_long* pos;
-    ffm_float* labels;
-    ffm_float* scales;
-
-	ffm_int n = 0;
-    ffm_int m = 0;
-};
-
 void ffm_read_problem_to_disk(string txt_path, string bin_path);
 
 void ffm_save_model(ffm_model &model, string path);
@@ -68,19 +49,38 @@ ffm_model ffm_train_on_disk(string Tr_path, string Va_path, ffm_parameter param)
 ffm_float ffm_predict(ffm_node *begin, ffm_node *end, ffm_model &model);
 
 
-// new methods for the wrapper
+// new structs and methods for the wrapper
 
-ffm_model ffm_load_model_c_string(char* path);
+struct ffm_line {
+    ffm_node* data;
+    ffm_float label;
+    ffm_int size;
+};
 
-void ffm_save_model_c_string(ffm_model &model, char* path);
+struct ffm_problem {
+    ffm_int size = 0;
+    ffm_long num_nodes = 0;
 
-ffm_problem ffm_convert_data(ffm_line* data, ffm_int num_lines);
+    ffm_node* data;
+    ffm_long* pos;
+    ffm_float* labels;
+    ffm_float* scales;
+
+    ffm_int n = 0;
+    ffm_int m = 0;
+};
+
+ffm_model ffm_load_model_c_string(char *path);
+
+void ffm_save_model_c_string(ffm_model &model, char *path);
+
+ffm_problem ffm_convert_data(ffm_line *data, ffm_int num_lines);
 
 ffm_model ffm_init_model(ffm_problem &data, ffm_parameter params);
 
 ffm_float ffm_train_iteration(ffm_problem &data, ffm_model &model, ffm_parameter params);
 
-ffm_float ffm_predict_array(ffm_node* nodes, int len, ffm_model &model);
+ffm_float ffm_predict_array(ffm_node *nodes, int len, ffm_model &model);
 
 ffm_float* ffm_predict_batch(ffm_problem &data, ffm_model &model);
 

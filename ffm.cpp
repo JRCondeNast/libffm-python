@@ -839,10 +839,6 @@ ffm_float ffm_predict_array(ffm_node* nodes, int len, ffm_model &model) {
     ffm_node* begin = nodes;
     ffm_node* end = begin + len;
 
-//  for(ffm_node *N = begin; N != end; N++) {
-//      cout << N->f << " " << N->j << " " << N->v << endl;
-//  }
-
     return ffm_predict(begin, end, model);
 }
 
