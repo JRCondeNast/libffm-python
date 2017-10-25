@@ -771,9 +771,9 @@ ffm_float* ffm_predict_batch(ffm_problem &prob, ffm_model &model) {
     return result;
 }
 
-//void free_ffm_float(ffm_float *data) {
-//    delete data;
-//}
+void free_ffm_float(ffm_float *data) {
+    delete data;
+}
 
 
 void ffm_save_model(ffm_model &model, string path) {
