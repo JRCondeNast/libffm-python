@@ -76,6 +76,8 @@ void ffm_save_model_c_string(ffm_model &model, char *path);
 
 ffm_problem ffm_convert_data(ffm_line *data, ffm_int num_lines);
 
+void free_ffm_data(ffm_problem *data);
+
 ffm_model ffm_init_model(ffm_problem &data, ffm_parameter params);
 
 ffm_float ffm_train_iteration(ffm_problem &data, ffm_model &model, ffm_parameter params);
