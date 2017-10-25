@@ -141,7 +141,7 @@ class FFM():
     def __init__(self, eta=0.2, lam=0.00002, k=4):
         self._params = FFM_Parameter(eta=eta, lam=lam, k=k)
         self._model = None
-        self.pred_ptr = None
+        self.prt_address_count = []
 
     def read_model(self, path):
         path_char = ctypes.c_char_p(path.encode())
@@ -171,13 +171,15 @@ class FFM():
         data = ffm_data._data
         model = self._model
 
-        self.pred_ptr = _lib.ffm_predict_batch(data, model)
+        pred_ptr = _lib.ffm_predict_batch(data, model)
 
         size = data.size
-        pred_ptr_address = ctypes.addressof(self.pred_ptr.contents)
+        pred_ptr_address = ctypes.addressof(pred_ptr.contents)
         array_cast = (ctypes.c_float * size).from_address(pred_ptr_address)
 
         pred = np.ctypeslib.as_array(array_cast)
+        del pred_ptr
+        # self.prt_address_count.append(pred_ptr)
         return pred
 
     def _predict_row(self, nodes):
@@ -195,11 +197,14 @@ class FFM():
 
         return self
 
-    def __del__(self):
-        if self.pred_ptr is not None:
-                _lib.free_ffm_float(self.pred_ptr)
+    # def __del__(self):
+    #     if self.prt_address_count is not None:
+    #         for i in self.prt_address_count:
+    #               _lib.free_ffm_float(i)
+    #               print('deleted pred_ptr.')
 
 
     
 def read_model(path):
     return FFM().read_model(path)
+
