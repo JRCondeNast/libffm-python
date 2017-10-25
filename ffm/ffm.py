@@ -78,8 +78,8 @@ _lib.ffm_train_iteration.argtypes = [FFM_Problem_ptr, FFM_Model_ptr, FFM_Paramet
 _lib.ffm_predict_array.argtypes = [FFM_Node_ptr, ctypes.c_int, FFM_Model_ptr]
 _lib.ffm_predict_array.restype = ctypes.c_float
 
-_lib.free_ffm_float.restype = None
-_lib.free_ffm_float.argtypes = [ctypes.c_void_p]
+# _lib.free_ffm_float.restype = None
+# _lib.free_ffm_float.argtypes = [ctypes.c_void_p]
 
 _lib.ffm_predict_batch.restype = ctypes.POINTER(ctypes.c_float)
 _lib.ffm_predict_batch.argtypes = [FFM_Problem_ptr, FFM_Model_ptr]
@@ -177,8 +177,8 @@ class FFM():
         array_cast = (ctypes.c_float * size).from_address(pred_ptr_address)
 
         pred = np.ctypeslib.as_array(array_cast)
-        if pred_ptr is not None:
-            _lib.free_ffm_float(pred_ptr)
+        #if pred_ptr is not None:
+        #    _lib.free_ffm_float(pred_ptr)
         return pred
 
     def _predict_row(self, nodes):
