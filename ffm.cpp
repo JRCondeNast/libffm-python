@@ -700,6 +700,10 @@ ffm_problem ffm_convert_data(ffm_line* data, ffm_int num_lines) {
 }
 
 void free_ffm_data(ffm_problem *data) {
+    delete data->data;
+    delete data->labels;
+    delete data->pos;
+    delete data->scales;
     delete data;
 }
 
