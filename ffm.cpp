@@ -688,11 +688,15 @@ ffm_problem ffm_convert_data(ffm_line* data, ffm_int num_lines) {
     result.size = num_lines;
 
     result.data = X;
+    printf("allocated address in ffm_convert_data.data: %p\n", result.data);
     result.num_nodes = num_nodes;
     result.pos = P;
+    printf("allocated address in ffm_convert_data.pos: %p\n", result.pos);
 
     result.labels = Y;
+    printf("allocated address in ffm_convert_data.labels: %p\n", result.labels);
     result.scales = R;
+    printf("allocated address in ffm_convert_data.scales: %p\n", result.scales);
     result.n = n;
     result.m = m;
 
@@ -743,6 +747,8 @@ ffm_float ffm_train_iteration(ffm_problem& prob, ffm_model& model, ffm_parameter
         wTx(begin, end, r, model, kappa, params.eta, params.lambda, true);
     }
 
+    // delete idx;
+
     return loss / len;
 }
 
@@ -763,6 +769,8 @@ ffm_float* ffm_predict_batch(ffm_problem &prob, ffm_model &model) {
 
         result[i] = 1 / (1 + exp(-t));
     }
+
+    printf("allocated address in ffm_predict_batch: %p\n", result);
 
     return result;
 }
@@ -841,5 +849,22 @@ ffm_float ffm_predict_array(ffm_node* nodes, int len, ffm_model &model) {
 
     return ffm_predict(begin, end, model);
 }
+
+void free_ffm_float(ffm_float *data) {
+    printf("freeing ffm_float address: %p\n", data);
+    delete data;
+}
+
+void free_ffm_problem(ffm_problem data) {
+    printf("freeing ffm_problem.data address: %p\n", data.data);
+    printf("freeing ffm_problem.pos address: %p\n", data.pos);
+    printf("freeing ffm_problem.labels address: %p\n", data.labels);
+    printf("freeing ffm_problem.scales address: %p\n", data.scales);
+    delete data.data;
+    delete data.pos;
+    delete data.labels;
+    delete data.scales;
+}
+
 
 } // namespace ffm
