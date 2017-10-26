@@ -64,7 +64,7 @@ FFM_Float_ptr = ctypes.POINTER(ctypes.c_float)
 
 _lib = ctypes.cdll.LoadLibrary(lib_path)
 
-_lib.ffm_convert_data.restype = FFM_Problem
+_lib.ffm_convert_data.restype = FFM_Problem_ptr
 _lib.ffm_convert_data.argtypes = [FFM_Line_ptr, ctypes.c_int]
 
 _lib.free_ffm_problem.restype = None
@@ -132,9 +132,9 @@ class FFMData():
     def num_rows(self):
         return self._data.size
 
-    # def __del__(self):
-        # if self._data is not None:
-        #     _lib.free_ffm_problem(self._data)
+    def __del__(self):
+        if self._data is not None:
+            _lib.free_ffm_problem(self._data)
 
 
 class Prediction:
@@ -187,7 +187,7 @@ class FFM():
 
         pred_ptr = _lib.ffm_predict_batch(data, model)
 
-        return Prediction(pred_ptr, data)
+        return Prediction(pred_ptr, data.contents)
 
     def _predict_row(self, nodes):
         n = nodes._length_
