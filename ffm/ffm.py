@@ -60,7 +60,6 @@ FFM_Node_ptr = ctypes.POINTER(FFM_Node)
 FFM_Line_ptr = ctypes.POINTER(FFM_Line)
 FFM_Model_ptr = ctypes.POINTER(FFM_Model)
 FFM_Problem_ptr = ctypes.POINTER(FFM_Problem)
-FFM_Float_ptr = ctypes.POINTER(ctypes.c_float)
 
 _lib = ctypes.cdll.LoadLibrary(lib_path)
 
