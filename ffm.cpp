@@ -640,7 +640,7 @@ ffm_model ffm_train_on_disk(string tr_path, string va_path, ffm_parameter param)
     return model;
 }
 
-ffm_problem ffm_convert_data(ffm_line* data, ffm_int num_lines) {
+ffm_problem* ffm_convert_data(ffm_line* data, ffm_int num_lines) {
     ffm_float* Y = new ffm_float[num_lines];
     ffm_float* R = new ffm_float[num_lines];
     ffm_long* P = new ffm_long[num_lines + 1];
@@ -684,17 +684,19 @@ ffm_problem ffm_convert_data(ffm_line* data, ffm_int num_lines) {
         i++;
     }
 
-    ffm_problem result;
-    result.size = num_lines;
+    ffm_problem* result = new ffm_problem;
+    printf("allocated address in ffm_convert_data: %p\n", result);
 
-    result.data = X;
-    result.num_nodes = num_nodes;
-    result.pos = P;
+    result->size = num_lines;
 
-    result.labels = Y;
-    result.scales = R;
-    result.n = n;
-    result.m = m;
+    result->data = X;
+    result->num_nodes = num_nodes;
+    result->pos = P;
+
+    result->labels = Y;
+    result->scales = R;
+    result->n = n;
+    result->m = m;
 
     return result;
 }
@@ -751,6 +753,8 @@ ffm_float ffm_train_iteration(ffm_problem& prob, ffm_model& model, ffm_parameter
         wTx(begin, end, r, model, kappa, params.eta, params.lambda, true);
     }
 
+    delete[] idx;
+
     return loss / len;
 }
 
@@ -771,6 +775,8 @@ ffm_float* ffm_predict_batch(ffm_problem &prob, ffm_model &model) {
 
         result[i] = 1 / (1 + exp(-t));
     }
+
+    printf("allocated address in ffm_predict_batch: %p\n", result);
 
     return result;
 }
@@ -853,5 +859,20 @@ ffm_float ffm_predict_array(ffm_node* nodes, int len, ffm_model &model) {
 
     return ffm_predict(begin, end, model);
 }
+
+void free_ffm_float(ffm_float *data) {
+    printf("freeing ffm_float address: %p\n", data);
+    delete data;
+}
+
+void free_ffm_problem(ffm_problem *data) {
+    printf("freeing ffm_problem address: %p\n", data);
+    delete data->data;
+    delete data->labels;
+    delete data->pos;
+    delete data->scales;
+    delete data;
+}
+
 
 } // namespace ffm

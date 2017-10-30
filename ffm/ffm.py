@@ -60,14 +60,18 @@ FFM_Node_ptr = ctypes.POINTER(FFM_Node)
 FFM_Line_ptr = ctypes.POINTER(FFM_Line)
 FFM_Model_ptr = ctypes.POINTER(FFM_Model)
 FFM_Problem_ptr = ctypes.POINTER(FFM_Problem)
+FFM_Float_ptr = ctypes.POINTER(ctypes.c_float)
 
 _lib = ctypes.cdll.LoadLibrary(lib_path)
 
-_lib.ffm_convert_data.restype = FFM_Problem
+_lib.ffm_convert_data.restype = FFM_Problem_ptr
 _lib.ffm_convert_data.argtypes = [FFM_Line_ptr, ctypes.c_int]
 
-_lib.free_ffm_data.restype = None
-_lib.free_ffm_data.argtypes = [ctypes.c_void_p]
+_lib.free_ffm_problem.restype = None
+_lib.free_ffm_problem.argtypes = [FFM_Problem_ptr]
+
+_lib.free_ffm_float.restype = None
+_lib.free_ffm_float.argtypes = [FFM_Float_ptr]
 
 _lib.ffm_init_model.restype = FFM_Model
 _lib.ffm_init_model.argtypes = [FFM_Problem_ptr, FFM_Parameter]
@@ -77,9 +81,6 @@ _lib.ffm_train_iteration.argtypes = [FFM_Problem_ptr, FFM_Model_ptr, FFM_Paramet
 
 _lib.ffm_predict_array.argtypes = [FFM_Node_ptr, ctypes.c_int, FFM_Model_ptr]
 _lib.ffm_predict_array.restype = ctypes.c_float
-
-_lib.free_ffm_float.restype = None
-_lib.free_ffm_float.argtypes = [ctypes.c_void_p]
 
 _lib.ffm_predict_batch.restype = ctypes.POINTER(ctypes.c_float)
 _lib.ffm_predict_batch.argtypes = [FFM_Problem_ptr, FFM_Model_ptr]
@@ -133,7 +134,21 @@ class FFMData():
 
     def __del__(self):
         if self._data is not None:
-            _lib.free_ffm_data(self._data)
+            _lib.free_ffm_problem(self._data)
+
+
+class Prediction:
+    def __init__(self, pred_ptr=None, data=None):
+        if pred_ptr is not None:
+            self._pred_ptr = pred_ptr
+            size = data.size
+            pred_ptr_address = ctypes.addressof(pred_ptr.contents)
+            array_cast = (ctypes.c_float * size).from_address(pred_ptr_address)
+            self.pred = np.ctypeslib.as_array(array_cast)
+
+    def __del__(self):
+        if self._pred_ptr is not None:
+            _lib.free_ffm_float(self._pred_ptr)
 
 # FFM model
 
@@ -141,7 +156,6 @@ class FFM():
     def __init__(self, eta=0.2, lam=0.00002, k=4):
         self._params = FFM_Parameter(eta=eta, lam=lam, k=k)
         self._model = None
-        self.prt_address_count = []
 
     def read_model(self, path):
         path_char = ctypes.c_char_p(path.encode())
@@ -173,14 +187,7 @@ class FFM():
 
         pred_ptr = _lib.ffm_predict_batch(data, model)
 
-        size = data.size
-        pred_ptr_address = ctypes.addressof(pred_ptr.contents)
-        array_cast = (ctypes.c_float * size).from_address(pred_ptr_address)
-
-        pred = np.ctypeslib.as_array(array_cast)
-        del pred_ptr
-        # self.prt_address_count.append(pred_ptr)
-        return pred
+        return Prediction(pred_ptr, data.contents)
 
     def _predict_row(self, nodes):
         n = nodes._length_
@@ -197,14 +204,6 @@ class FFM():
 
         return self
 
-    # def __del__(self):
-    #     if self.prt_address_count is not None:
-    #         for i in self.prt_address_count:
-    #               _lib.free_ffm_float(i)
-    #               print('deleted pred_ptr.')
-
-
     
 def read_model(path):
     return FFM().read_model(path)
-
